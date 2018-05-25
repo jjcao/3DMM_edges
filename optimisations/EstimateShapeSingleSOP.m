@@ -24,7 +24,8 @@ end
 %b = A\h;
 
 % Hyper-box constrained linear solution:
-options = optimset('LargeScale','off','Algorithm', 'active-set', 'Display','off');
+%options = optimset('LargeScale','off','Algorithm', 'interior-point', 'Display','off');
+options = optimset('LargeScale','off','Algorithm', 'trust-region-reflective', 'Display','off');
 C = [eye(ndims); -eye(ndims)];    
 d = [numsd.*shapeEV; numsd.*shapeEV];
 b = lsqlin(A,h,C,d,[],[],[],[],[],options);

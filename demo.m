@@ -1,10 +1,11 @@
 clear all
 
 %% 
-addpath('ZhuRamananDetector','optimisations','utils','comparison');
+%addpath('ZhuRamananDetector','optimisations','utils','comparison');
+addpath('ZhuRamananDetector','optimisations','utils');
 
 % YOU MUST set this to the base directory of the Basel Face Model
-BFMbasedir = '';
+BFMbasedir = '../../data/BFM09/PublicMM1/';
 
 % Load morphable model
 load(strcat(BFMbasedir,'01_MorphableModel.mat'));
