@@ -45,6 +45,8 @@ options.w2 = 0.15;
 
 testdir='testImages/';
 im = imread(strcat(testdir,'image_0018.png'));
+%im = imread(strcat(testdir,'image_0018.png'));
+%
 edgeim = edge(rgb2gray(im),'canny',0.15);
 
 ZRtimestart = tic;
