@@ -12,7 +12,7 @@ addpath ../jjcao_code/toolbox/kdtree;
 %save('t1.mat','FV', 'im', 'R', 't', 's')
 
 badTextThre = 0.2;
-negativeThre = 25000;%1000
+negativeThre = 0;%25000%15000;%1000
 
 %%
 load image_0018.mat;
@@ -59,15 +59,16 @@ idx = false(size(FV.vertices,1),1);
 idx(edges(1,pos)) = true;
 idx(edges(2,pos)) = true;
 idx(idx_postive) = false;
+idx_via_ratio = idx;
 
 FVr = FV;
 FVr.vertices = rotpts';
-pts = FVr.vertices(idx,:);
+pts = FVr.vertices(idx_via_ratio,:);
 figure; patch(FVr); axis equal; view3d rot; hold on;
 scatter3(pts(:,1),pts(:,2),pts(:,3),10,'.','MarkerEdgeColor','r'); 
-pts = FVr.vertices(idx_negative_sym(idx),:);
+pts = FVr.vertices(idx_negative_sym(idx_via_ratio),:);
 scatter3(pts(:,1),pts(:,2),pts(:,3),10,'.','MarkerEdgeColor','g'); 
-
+title('ratio between edges')
 %% find vertices with poor texture & negative x, by analysing inner product between vertex normal and z axis
 % 这样找到的idx不稀疏了，但是为啥修复后的texture有这么明显的光照问题？
 normal = compute_normal(FVr.vertices,FVr.faces, 1)';
@@ -78,15 +79,16 @@ pos = abs(angle)<0.5;
 idx = false(size(FV.vertices,1),1);
 idx(pos) = true;
 idx(idx_postive) = false;
+idx_via_normal = idx;
 
 FVr = FV;
 FVr.vertices = rotpts';
-pts = FVr.vertices(idx,:);
+pts = FVr.vertices(idx_via_normal,:);
 figure; patch(FVr); axis equal; view3d rot; hold on;
-%scatter3(pts(:,1),pts(:,2),pts(:,3),10,'.','MarkerEdgeColor','r'); 
-pts = FVr.vertices(idx_negative_sym(idx),:);
+scatter3(pts(:,1),pts(:,2),pts(:,3),10,'.','MarkerEdgeColor','r'); 
+pts = FVr.vertices(idx_negative_sym(idx_via_normal),:);
 scatter3(pts(:,1),pts(:,2),pts(:,3),10,'.','MarkerEdgeColor','g'); 
-
+title('via normal')
 %% 对称一半是对的，而对称一部分点，是错的；说明是idx计算有问题；
 % idx的顶点在脑门和嘴角比原始顶点稀疏，是edges算得不对？ 
 % 改用旋转后的顶点的法向和z轴的夹角，有提高，但还是不自然。
@@ -103,12 +105,25 @@ FVr.facevertexcdata = faceTexture(FV,R,t,s,im);
 figure;
 p = patch(FVr, 'FaceVertexCData', FVr.facevertexcdata, 'EdgeColor', 'none'); axis equal; axis off; p.FaceColor = 'interp';
 view3d rot; hold on;
-
-%%
-FVr.facevertexcdata(idx_negative,:) = FVr.facevertexcdata(idx_negative_sym(idx_negative),:)*1.2;
+title('original texture')
+%% repair texture via x coordinate
+FVr.facevertexcdata(idx_negative,:) = FVr.facevertexcdata(idx_negative_sym(idx_negative),:);
 figure;
 p = patch(FVr, 'FaceVertexCData', FVr.facevertexcdata, 'EdgeColor', 'none'); axis equal; axis off; p.FaceColor = 'interp';
 view3d rot; hold on;
+title('repair via coordinate'); 
+%light;
+
+%% repair texture via normal
+FVr.facevertexcdata = faceTexture(FV,R,t,s,im);
+FVr.facevertexcdata(idx_via_normal,:) = FVr.facevertexcdata(idx_negative_sym(idx_via_normal),:);
+figure;
+p = patch(FVr, 'FaceVertexCData', FVr.facevertexcdata, 'EdgeColor', 'none','FaceLighting', 'phong'); axis equal; axis off; p.FaceColor = 'interp';
+view3d rot; hold on;
+title('repair via normal');
+light;
+
+%figure;
 % pts = FVr.vertices(idx_negative_sym(idx),:);
 % scatter3(pts(:,1),pts(:,2),pts(:,3),100,'.','MarkerEdgeColor','g'); 
 % pts = FVr.vertices(idx,:);
