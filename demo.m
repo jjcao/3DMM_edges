@@ -44,7 +44,9 @@ options.w2 = 0.15;
 %% Setup basic parameters
 
 testdir='testImages/';
-im = imread(strcat(testdir,'image_0018.png'));
+inputFile = 'test_LFW1';%test_LFW1,image_0018,fface1,sface1;
+
+im = imread(strcat(testdir,[inputFile '.png']));
 %im = imread(strcat(testdir,'image_0018.png'));
 %
 edgeim = edge(rgb2gray(im),'canny',0.15);
@@ -117,3 +119,6 @@ FV.vertices=reshape(shapePC(:,1:ndims)*b+shapeMU,3,size(shapePC,1)/3)';
 figure; subplot(1,3,1); patch(FV, 'FaceColor', [1 1 1], 'EdgeColor', 'none', 'FaceLighting', 'phong'); light; axis equal; axis off;
 subplot(1,3,2); imshow(renderFace(FV,im,R,t,s,false));
 subplot(1,3,3); imshow(renderFace(FV,im,R,t,s,true));
+
+
+save([inputFile '.mat'],'FV', 'im', 'R', 't', 's')
