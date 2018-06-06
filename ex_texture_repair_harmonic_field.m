@@ -6,11 +6,13 @@
 clear;clc;close all;
 MYTOOLBOXROOT='../jjcao_code/toolbox/';
 addpath ([MYTOOLBOXROOT 'jjcao_mesh'])
+addpath ([MYTOOLBOXROOT 'jjcao_common'])
+addpath ([MYTOOLBOXROOT 'jjcao_math'])
 addpath ([MYTOOLBOXROOT 'jjcao_interact'])
 
 DEBUG=1;
-badTextThre = 0.5;
-inputFile = 'test_LFW1_texture';%test_LFW1,image_0018,fface1,sface1
+badTextThre = 0.3;
+inputFile = 'output/lin_texture';%test_LFW1,image_0018,fface1,sface1
 %% input
 load([inputFile '.mat']);
 %[verts,faces] = read_mesh([MYTOOLBOXROOT 'fface1.obj']);
@@ -19,6 +21,11 @@ load([inputFile '.mat']);
 verts = FV.vertices;
 faces = FV.faces;
 nverts = size(verts,1);
+
+figure;
+p = patch(FV, 'FaceVertexCData', FV.facevertexcdata, 'EdgeColor', 'none'); axis equal; axis off; p.FaceColor = 'interp';
+view3d rot; hold on;
+title('original texture')
 
 %% find vertices with poor texture by analysing inner product between vertex normal and z axis
 FVr = FV;

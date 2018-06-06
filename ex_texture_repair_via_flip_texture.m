@@ -11,7 +11,7 @@ addpath ../jjcao_code/toolbox/kdtree;
 %%
 badTextThre = 0.2;
 negativeThre = 0;%25000%15000;%0
-inputFile = 'test_LFW1';%test_LFW1,image_0018,fface1,sface1;
+inputFile = 'output/lin';%test_LFW1,image_0018,fface1,sface1;
 DEBUG=1;
 %%
 load([inputFile '.mat']);
@@ -161,10 +161,10 @@ title('repair via coordinate');
 % write_obj('fface1.obj', V2, FV.faces);
 
 %%
-% figure; 
-% subplot(1,2,1); 
-% p = patch(FVr, 'FaceVertexCData', FVr.facevertexcdata, 'EdgeColor', 'none'); light; axis equal; axis off; p.FaceColor = 'interp';
-% %patch(FV, 'FaceColor', [1 1 1], 'EdgeColor', 'none', 'FaceLighting', 'phong');light; axis equal; axis off;
-% colorbar
-% subplot(1,2,2); imshow(renderFace(FVr,im,R,t,s,true));
-% % subplot(1,3,3); imshow(renderFace(FV,im,R,t,s,true));
+figure; 
+subplot(1,3,1); 
+p = patch(FVr, 'FaceVertexCData', FVr.facevertexcdata, 'EdgeColor', 'none'); light; axis equal; axis off; p.FaceColor = 'interp';
+%patch(FV, 'FaceColor', [1 1 1], 'EdgeColor', 'none', 'FaceLighting', 'phong');light; axis equal; axis off;
+colorbar
+subplot(1,3,2); imshow(renderFace(FVr,im,R,t,s,true));
+subplot(1,3,3); imshow(renderFace(FV,im,R,t,s,false));

@@ -43,10 +43,10 @@ options.w2 = 0.15;
 
 %% Setup basic parameters
 
-testdir='testImages/';
-inputFile = 'test_LFW1';%test_LFW1,image_0018,fface1,sface1;
+testdir='inputImages/';
+inputFile = 'lin';%test_LFW1,image_0018,fface1,sface1;
 
-im = imread(strcat(testdir,[inputFile '.png']));
+im = imread(strcat(testdir,[inputFile '.jpg']));
 %im = imread(strcat(testdir,'image_0018.png'));
 %
 edgeim = edge(rgb2gray(im),'canny',0.15);
