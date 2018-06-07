@@ -18,12 +18,9 @@ load([inputFile '.mat']);
 %[verts,faces] = read_mesh([MYTOOLBOXROOT 'fface1.obj']);
 %save('fface1_texture.mat','FV','im', 'R', 't', 's');
 
-verts = FV.vertices;
-faces = FV.faces;
-nverts = size(verts,1);
-
+idx_poor = FV.vertices(:,3) < 50000;
 figure;
-p = patch(FV, 'FaceVertexCData', FV.facevertexcdata, 'EdgeColor', 'none'); axis equal; axis off; p.FaceColor = 'interp';
+p = patch(FV, 'FaceVertexCData', FV.facevertexcdata, 'EdgeColor', 'none'); axis equal; p.FaceColor = 'interp';
 view3d rot; hold on;
 title('original texture')
 
@@ -69,7 +66,7 @@ end
 options = [];
 type = 'conformal';%combinatorial;conformal;%spring
 options.use_c_implementation = 1;
-tic; L = compute_mesh_laplacian(verts,faces,type);toc
+tic; L = compute_mesh_laplacian(FV.vertices,FV.faces,type);toc
 
 %% repair
 options.solver = 1;
@@ -80,6 +77,7 @@ tic;fid = compute_least_square_system(L, b, constraint_id, constraint_value,opti
 
 
 %% output & plot
+fid(idx_poor,:) = NaN;
 figure;title('repaired texture')
 p = patch(FV, 'FaceVertexCData', fid, 'EdgeColor', 'none'); axis equal; axis off; p.FaceColor = 'interp';
 view3d rot; hold on;
