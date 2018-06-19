@@ -1,6 +1,12 @@
 % jjcao @ 2018
 
 clc;clearvars;close all;
+MYTOOLBOXROOT='../../jjcao_code/toolbox/';
+addpath ([MYTOOLBOXROOT 'jjcao_mesh'])
+addpath ([MYTOOLBOXROOT 'jjcao_mesh/feature'])
+addpath ([MYTOOLBOXROOT 'jjcao_io'])
+addpath ([MYTOOLBOXROOT 'kdtree'])
+addpath ([MYTOOLBOXROOT 'jjcao_interact'])
 addpath utils;
 addpath ../jjcao_code/toolbox/jjcao_interact;
 addpath ../jjcao_code/toolbox/jjcao_mesh;
@@ -10,8 +16,9 @@ addpath ../jjcao_code/toolbox/kdtree;
 %addpath(genpath('../'));
 %%
 badTextThre = 0.2;
-negativeThre = 0;%25000%15000;%0
-inputFile = 'output/lin';%test_LFW1,image_0018,fface1,sface1;
+negativeThre = 25000;%25000%15000;%0
+stitchBelt = 4000;
+inputFile = 'output/image_0018';%test_LFW1,image_0018,fface1,sface1;
 DEBUG=1;
 %%
 load([inputFile '.mat']);
@@ -47,7 +54,7 @@ kdtree_delete(tree);
 
 %% find vertices with poor texture & negative x, by analysing ratio between 3D edges and the projected 2d edges
 % idx_via_ratio(i) == 1 means that texture of ith vertex is poor & netative x
-% note: idx_via_ratio的顶点在脑门和嘴角比原始顶点稀疏，缺了很多vertex，是edges算得不对？ 还没找到原因。
+% note: idx_via_ratio的顶点在脑门和嘴角比原始顶点�?��，缺了很多vertex，是edges算得不对�?还没找到原因�?
 % 
 
 % rotpts = R*FV.vertices';
@@ -76,7 +83,7 @@ kdtree_delete(tree);
 % title('ratio between edges')
 
 %% find vertices with poor texture & negative x, by analysing inner product between vertex normal and z axis
-% 这样找到的idx_via_normal不稀疏了，但是修复后的texture光照问题明显，不能通过整体修正改善，必须要做局部blending
+% 这样找到的idx_via_normal不稀疏了，但是修复后的texture光照问题明显，不能�?过整体修正改善，必须要做�?��blending
 FVr = FV;
 FVr.vertices = (R*FV.vertices')';
 vnormal = compute_normal(FVr.vertices,FVr.faces, 1)';
@@ -118,7 +125,7 @@ save([inputFile '_texture.mat'],'FV','im', 'R', 't', 's');
 
 %% repair texture via normal
 FVr.facevertexcdata = faceTexture(FV,R,t,s,im);
-FVr.facevertexcdata(idx_via_normal,:) = FVr.facevertexcdata(idx_negative_sym(idx_via_normal),:);
+FVr.facevertexcdata(idx_via_normal,:) = 0.5*(FVr.facevertexcdata(idx_via_normal,:)+FVr.facevertexcdata(idx_negative_sym(idx_via_normal),:));
 figure;
 p = patch(FVr, 'FaceVertexCData', FVr.facevertexcdata, 'EdgeColor', 'none','FaceLighting', 'phong'); axis equal; axis off; p.FaceColor = 'interp';
 view3d rot; hold on;
@@ -132,12 +139,50 @@ title('repair via normal');
 % scatter3(pts(:,1),pts(:,2),pts(:,3),100,'.','MarkerEdgeColor','r'); 
 
 %% repair texture via x coordinate
-FVr.facevertexcdata(idx_negative,:) = FVr.facevertexcdata(idx_negative_sym(idx_negative),:);
+FVr.facevertexcdata = faceTexture(FV,R,t,s,im);
+FVr.facevertexcdata(idx_negative,:) = FVr.facevertexcdata(idx_negative_sym(idx_negative),:)*1.0;
 figure;
 p = patch(FVr, 'FaceVertexCData', FVr.facevertexcdata, 'EdgeColor', 'none'); axis equal; axis off; p.FaceColor = 'interp';
 view3d rot; hold on;
 title('repair via coordinate'); 
-%light;
+
+%%
+idx1 = FV.vertices(:,1)>=(-negativeThre + stitchBelt);
+idx2 = FV.vertices(:,1)<(-negativeThre - stitchBelt);
+idx_handle = (idx1 | idx2);
+idx_handle = idx_handle & (~isnan(FVr.facevertexcdata(:,1)));
+constraint_id=find(idx_handle);
+constraint_value = FVr.facevertexcdata(idx_handle,:);
+idx = ~idx_handle;
+
+if DEBUG
+    figure; 
+    %patch(FV);
+    axis equal; view3d rot; hold on;
+    pts = FVr.vertices(idx,:);
+    scatter3(pts(:,1),pts(:,2),pts(:,3),10,'.','MarkerEdgeColor','r'); 
+    pts = FVr.vertices(idx_handle,:);
+    scatter3(pts(:,1),pts(:,2),pts(:,3),10,'.','MarkerEdgeColor','g'); 
+    title('handles')
+end
+
+%% computen Laplacian
+options = [];
+type = 'conformal';%combinatorial;conformal;%spring
+options.use_c_implementation = 1;
+tic; L = compute_mesh_laplacian(FV.vertices,FV.faces,type);toc
+
+% repair
+options.solver = 1;
+options.method = 'hard';% 'hard', 'soft'
+b = zeros(size(L,1),3);
+
+tic;fid = compute_least_square_system(L, b, constraint_id, constraint_value,options);toc
+
+% output & plot
+figure;title('repaired texture')
+p = patch(FVr, 'FaceVertexCData', fid, 'EdgeColor', 'none'); axis equal; axis off; p.FaceColor = 'interp';
+view3d rot; hold on;
 
 %%
 % Rr = R;
