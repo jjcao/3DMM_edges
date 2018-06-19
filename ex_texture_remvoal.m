@@ -10,7 +10,7 @@ addpath ../jjcao_code/toolbox/jjcao_io;
 badTextThre = 0.2;
 inputFile = 'image_0018.mat';%test_LFW1,image_0018,fface1,sface1
 %%
-load(inputFile);
+load(['output/' inputFile]);
 
 %% find vertices with poor texture, by analysing inner product between vertex normal and z axis
 FVr = FV;

@@ -10,7 +10,7 @@ addpath ../jjcao_code/toolbox/jjcao_mesh/feature;
 addpath ../jjcao_code/toolbox/kdtree;
 
 inputFile = 'image_0018_texture.mat';
-load(inputFile);
+load(['output/' inputFile]);
 
 oglp.height=size(im,1);
 oglp.width=size(im,2);
