@@ -1,18 +1,14 @@
 % jjcao @ 2018
 
 clc;clearvars;close all;
-MYTOOLBOXROOT='../../jjcao_code/toolbox/';
+%MYTOOLBOXROOT='../../jjcao_code/toolbox/';
+MYTOOLBOXROOT='E:/jjcao_code/toolbox/';
 addpath ([MYTOOLBOXROOT 'jjcao_mesh'])
 addpath ([MYTOOLBOXROOT 'jjcao_mesh/feature'])
 addpath ([MYTOOLBOXROOT 'jjcao_io'])
 addpath ([MYTOOLBOXROOT 'kdtree'])
 addpath ([MYTOOLBOXROOT 'jjcao_interact'])
 addpath utils;
-addpath ../jjcao_code/toolbox/jjcao_interact;
-addpath ../jjcao_code/toolbox/jjcao_mesh;
-addpath ../jjcao_code/toolbox/jjcao_mesh/feature;
-addpath ../jjcao_code/toolbox/jjcao_io;
-addpath ../jjcao_code/toolbox/kdtree;
 %addpath(genpath('../'));
 %%
 badTextThre = 0.2;
@@ -54,7 +50,7 @@ kdtree_delete(tree);
 
 %% find vertices with poor texture & negative x, by analysing ratio between 3D edges and the projected 2d edges
 % idx_via_ratio(i) == 1 means that texture of ith vertex is poor & netative x
-% note: idx_via_ratio的顶点在脑门和嘴角比原始顶点�?��，缺了很多vertex，是edges算得不对�?还没找到原因�?
+% note: idx_via_ratio的顶点在脑门和嘴角比原始顶点�?��，缺了很多vertex，是edges算得不对�?还没找到原因�?
 % 
 
 % rotpts = R*FV.vertices';
@@ -83,7 +79,7 @@ kdtree_delete(tree);
 % title('ratio between edges')
 
 %% find vertices with poor texture & negative x, by analysing inner product between vertex normal and z axis
-% 这样找到的idx_via_normal不稀疏了，但是修复后的texture光照问题明显，不能�?过整体修正改善，必须要做�?��blending
+% 这样找到的idx_via_normal不稀疏了，但是修复后的texture光照问题明显，不能�?过整体修正改善，必须要做�?��blending
 FVr = FV;
 FVr.vertices = (R*FV.vertices')';
 vnormal = compute_normal(FVr.vertices,FVr.faces, 1)';
