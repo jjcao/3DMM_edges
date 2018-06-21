@@ -50,7 +50,7 @@ kdtree_delete(tree);
 
 %% find vertices with poor texture & negative x, by analysing ratio between 3D edges and the projected 2d edges
 % idx_via_ratio(i) == 1 means that texture of ith vertex is poor & netative x
-% note: idx_via_ratio的顶点在脑门和嘴角比原始顶点�?��，缺了很多vertex，是edges算得不对�?还没找到原因�?
+% note: idx_via_ratio的顶点在脑门和嘴角比原始顶点�?��，缺了很多vertex，是edges算得不对�?还没找到原因�?
 % 
 
 % rotpts = R*FV.vertices';
@@ -79,7 +79,7 @@ kdtree_delete(tree);
 % title('ratio between edges')
 
 %% find vertices with poor texture & negative x, by analysing inner product between vertex normal and z axis
-% 这样找到的idx_via_normal不稀疏了，但是修复后的texture光照问题明显，不能�?过整体修正改善，必须要做�?��blending
+% 这样找到的idx_via_normal不稀疏了，但是修复后的texture光照问题明显，不能�?过整体修正改善，必须要做�?��blending
 FVr = FV;
 FVr.vertices = (R*FV.vertices')';
 vnormal = compute_normal(FVr.vertices,FVr.faces, 1)';
@@ -179,27 +179,6 @@ tic;fid = compute_least_square_system(L, b, constraint_id, constraint_value,opti
 figure;title('repaired texture')
 p = patch(FVr, 'FaceVertexCData', fid, 'EdgeColor', 'none'); axis equal; axis off; p.FaceColor = 'interp';
 view3d rot; hold on;
-
-%%
-% Rr = R;
-% Rr(4,4)=1;
-% Sr = eye(4).*s;
-% Tr = eye(4);
-% Tr(1:2,4)=t;
-% T = Tr*Sr*Rr;
-% 
-% % Get the extrinsic transformation matrix
-% M = T(1: 3, :); % the output does not need to be in homogeneous coordinates
-% 
-% % Get the vertices
-% V           = FV.vertices;
-% Nvertices   = size(FV.vertices, 1);
-% 
-% % Compute the transformed vertices
-% V(:, 4)	= 1;        % use homogeneous coordinates for input
-% V2   	= V * M.';	% the vertices are transposed
-% 
-% write_obj('fface1.obj', V2, FV.faces);
 
 %%
 figure; 
