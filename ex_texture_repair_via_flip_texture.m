@@ -12,9 +12,9 @@ addpath utils;
 %addpath(genpath('../'));
 %%
 badTextThre = 0.2;
-negativeThre = 25000;%25000%15000;%0
-stitchBelt = 4000;
-inputFile = 'output/image_0018';%test_LFW1,image_0018,fface1,sface1;
+negativeThre = 0;%25000%15000;%0
+stitchBelt = 0;%4000
+inputFile = 'output/fface1';%test_LFW1,image_0018,fface1,sface1;
 DEBUG=1;
 %%
 load([inputFile '.mat']);
@@ -50,7 +50,7 @@ kdtree_delete(tree);
 
 %% find vertices with poor texture & negative x, by analysing ratio between 3D edges and the projected 2d edges
 % idx_via_ratio(i) == 1 means that texture of ith vertex is poor & netative x
-% note: idx_via_ratio的顶点在脑门和嘴角比原始顶点�?��，缺了很多vertex，是edges算得不对�?还没找到原因�?
+% note: idx_via_ratio的顶点在脑门和嘴角比原始顶点�?��，缺了很多vertex，是edges算得不对�?还没找到原因�?
 % 
 
 % rotpts = R*FV.vertices';
@@ -79,7 +79,7 @@ kdtree_delete(tree);
 % title('ratio between edges')
 
 %% find vertices with poor texture & negative x, by analysing inner product between vertex normal and z axis
-% 这样找到的idx_via_normal不稀疏了，但是修复后的texture光照问题明显，不能�?过整体修正改善，必须要做�?��blending
+% 这样找到的idx_via_normal不稀疏了，但是修复后的texture光照问题明显，不能�?过整体修正改善，必须要做�?��blending
 FVr = FV;
 FVr.vertices = (R*FV.vertices')';
 vnormal = compute_normal(FVr.vertices,FVr.faces, 1)';
@@ -173,13 +173,17 @@ options.solver = 1;
 options.method = 'hard';% 'hard', 'soft'
 b = zeros(size(L,1),3);
 
-tic;fid = compute_least_square_system(L, b, constraint_id, constraint_value,options);toc
+tic;FVr.facevertexcdata = compute_least_square_system(L, b, constraint_id, constraint_value,options);toc
 
 % output & plot
-figure;title('repaired texture')
-p = patch(FVr, 'FaceVertexCData', fid, 'EdgeColor', 'none'); axis equal; axis off; p.FaceColor = 'interp';
-view3d rot; hold on;
+cmean = mean(FVr.vertices);
+points = FVr.vertices - repmat(cmean, size(FVr.vertices,1),1);
+figure;set(gcf,'color','w');
+p = patch('Faces', FVr.faces, 'Vertices', points, 'FaceVertexCData', FVr.facevertexcdata, 'EdgeColor', 'none'); axis equal; axis off; p.FaceColor = 'interp'; view3d rot; 
+title('repaired texture');
 
+FV = FVr;
+save([inputFile '_texture.mat'],'FV','im', 'R', 't', 's');
 %%
 figure; 
 subplot(1,3,1); 

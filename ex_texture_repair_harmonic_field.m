@@ -4,7 +4,8 @@
 % Copyright (c) 2018 Junjie Cao
 %%
 clear;clc;close all;
-MYTOOLBOXROOT='../jjcao_code/toolbox/';
+%MYTOOLBOXROOT='../../jjcao_code/toolbox/';
+MYTOOLBOXROOT='E:/jjcao_code/toolbox/';
 addpath ([MYTOOLBOXROOT 'jjcao_mesh'])
 addpath ([MYTOOLBOXROOT 'jjcao_common'])
 addpath ([MYTOOLBOXROOT 'jjcao_math'])
@@ -12,7 +13,7 @@ addpath ([MYTOOLBOXROOT 'jjcao_interact'])
 
 DEBUG=1;
 badTextThre = 0.3;
-inputFile = 'output/wjq_texture';%test_LFW1,image_0018,fface1,sface1
+inputFile = 'output/fface1_texture';%test_LFW1,image_0018,fface1,sface1
 %% input
 load([inputFile '.mat']);
 %[verts,faces] = read_mesh([MYTOOLBOXROOT 'fface1.obj']);
@@ -78,7 +79,7 @@ tic;fid = compute_least_square_system(L, b, constraint_id, constraint_value,opti
 
 
 %% output & plot
-fid(idx_poor,:) = NaN;
+%fid(idx_poor,:) = NaN;
 figure;title('repaired texture')
 p = patch(FV, 'FaceVertexCData', fid, 'EdgeColor', 'none'); axis equal; axis off; p.FaceColor = 'interp';
 view3d rot; hold on;
